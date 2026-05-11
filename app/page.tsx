@@ -1,65 +1,124 @@
+"use client";
 import Image from "next/image";
+import React, { useEffect, useState } from "react";
+import pokelogo from "../public/pokelogo.jpg";
+import ClipLoader from "react-spinners/ClipLoader";
+import { AllPokeData } from "@/actions/Apicall";
+import { Fredoka } from "next/font/google";
 
-export default function Home() {
+const fredoka = Fredoka({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+});
+
+const page = () => {
+  const [pokemon, setpokemon] = useState<any[]>([]);
+  const [isloading, setisloading] = useState(true);
+
+  useEffect(() => {
+    // async function fetchData() {
+    //   setisloading(true);
+    //   const data = await (
+    //     await fetch("https://pokeapi.co/api/v2/pokemon?limit=20")
+    //   ).json();
+    //   setpokemon(data);
+    //   setisloading(false);
+    // }
+    AllPokeData().then((res) => {
+      setpokemon(res);
+      setisloading(false);
+    });
+  }, []);
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <div className="grid grid-rows-[1fr_5fr_1fr] h-screen gap-4">
+      <div className="border border-zinc-500 rounded-3xl text-white flex justify-center align-middle gap-4 font-bold text-8xl p-4">
+        <Image src={pokelogo} alt="logo" width={150} height={100} />
+        <p className="py-10">PokeDex</p>
+      </div>
+
+      <div className="text-white p-7 rounded-3xl">
+        {isloading ? (
+          <div className="flex justify-center items-center h-screen">
+            <ClipLoader size={50} color="#f1f1ff" speedMultiplier={1} />
+          </div>
+        ) : (
+          <div
+            className="
+        grid
+        grid-cols-1
+        sm:grid-cols-2
+        md:grid-cols-3
+        lg:grid-cols-4
+        xl:grid-cols-5
+        gap-9
+      "
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+            {pokemon.map((curr) => {
+              return (
+                <div
+                  key={curr.name}
+                  className="
+              bg-zinc-800
+              p-10
+              m-4
+              gap-3
+              rounded-2xl
+              shadow-lg
+              border
+              border-zinc-700
+              flex
+              justify-center
+              items-center
+              min-h-30
+              hover:scale-105
+              transition
+            "
+                >
+                  <div className={`flex flex-col ${fredoka.className}`}>
+                    <Image
+                      src={curr.sprites.other["official-artwork"].front_default}
+                      height={300}
+                      width={300}
+                      alt={"Pokemon Image"}
+                    ></Image>
+                    <p className="text-4xl font-bold capitalize flex justify-center ">
+                      {curr.name}
+                    </p>
+                    <div className="flex justify-start">
+                      <p className="text-xl font-semibold flex justify-evenly">
+                        Abilities :
+                      </p>
+
+                      {curr.abilities.map((data) => {
+                        let current = data.ability.name;
+                        return (
+                          <>
+                            <div
+                              key={current}
+                              className="flex justify-center capitalize text-xl font-light px-2 border-l-white"
+                            >
+                              {current} ,
+                            </div>
+                          </>
+                        );
+                      })}
+                    </div>
+                    {/* Types */}
+                    <div className="p-2 text-xl font-bold m-2 ">
+                      <p>Type : </p>
+                      {}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      <div className="border border-white text-white h-35">Footer</div>
     </div>
   );
-}
+};
+
+export default page;
